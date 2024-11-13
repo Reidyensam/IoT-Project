@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla y Gráfico en Tiempo Real</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Último Registro en Tiempo Real</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Tiempo</th>
+                <th>Calidad de Aire</th>
+                <th>Ultrasonico</th>
+                <th>Temperatura</th>
+                <th>Humedad</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Aquí se agregará la última fila de datos -->
+        </tbody>
+    </table>
+
+    <h2>Gráfico de Variables en Tiempo Real</h2>
+    <canvas id="variablesChart" width="400" height="200"></canvas>
+
+    <script>
+        const socket = io();
+        const aireValues = [];
+        const Ultrasonico = [];
+        const Temperatura = [];
+        const Humedad = [];
+        const labels = [];
+
+        // Escucha el evento 'updateTable' y actualiza la única fila en la página
+        socket.on('updateTable', (row) => {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = ''; // Limpiar la tabla para que solo tenga la última fila
+
+            // Crear una única fila con los datos recibidos
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.Tiempo}</td>
+                <td>${row.aire}</td>
+                <td>${row.Ultrasonico}</td>
+                <td>${row.Temperatura}</td>
+                <td>${row.Humedad}</td>
+            `;
+            tableBody.appendChild(tr); // Agregar la fila a la tabla
+
+            // Agregar los valores al gráfico
+            labels.push(row.Tiempo); // Etiqueta como el tiempo de cada registro
+            aireValues.push(row.aire);
+            Ultrasonico.push(row.Ultrasonico);
+            Temperatura.push(row.Temperatura);
+            Humedad.push(row.Humedad);
+
+            // Crear o actualizar el gráfico
+            const ctx = document.getElementById('variablesChart').getContext('2d');
+            const chartData = {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Calidad de Aire',
+                        data: aireValues,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: true,
+                    },
+                    {
+                        label: 'Ultrasonico',
+                        data: Ultrasonico,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: true,
+                    },
+                    {
+                        label: 'Temperatura',
+                        data: Temperatura,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: true,
+                    },
+                    {
+                        label: 'Humedad',
+                        data: Humedad,
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        fill: true,
+                    }
+                ]
+            };
+
+            if (window.myChart) {
+                // Si el gráfico ya existe, solo actualizar los datos sin animación
+                window.myChart.data = chartData;
+                window.myChart.update({
+                    duration: 0, // Sin animación al actualizar
+                    lazy: false // Actualización inmediata
+                });
+            } else {
+                // Si no existe, crear uno nuevo
+                window.myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        animation: false, // Desactivar animaciones al crear el gráfico
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
