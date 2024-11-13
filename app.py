@@ -19,11 +19,11 @@ db_config = {
 
 # Ruta para la página principal
 @app.route('/')
-async def index():
+def index():
     return render_template('index.html')
 
 # Emite el último registro y el gráfico en tiempo real
-async def data_stream():
+def data_stream():
     fibomassi_values = []  # Lista para almacenar los valores de Fibomassi
     while True:
         conn = mysql.connector.connect(**db_config)
@@ -46,9 +46,7 @@ async def data_stream():
         time.sleep(1)
 
 @socketio.on('connect')
-async def handle_connect():
+def handle_connect():
     socketio.start_background_task(data_stream)
-async def run_app():
-    await socketio.run(app, debug=True)
 if __name__ == '__main__':
     socketio.run(app, debug=True)
