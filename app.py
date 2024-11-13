@@ -4,7 +4,7 @@ from flask_socketio import SocketIO
 import mysql.connector
 import pandas as pd
 import time
-import asyncio
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app)
