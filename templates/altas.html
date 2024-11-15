@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Móvil de Monitoreo</title>
+    <title>Formulario de Altas</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
@@ -12,21 +12,16 @@
 </head>
 <body>
     <header>
-        <h1>Sistema Móvil de Monitoreo</h1>
+        <h1>Formulario de Altas (Agregar Registros)</h1>
     </header>
-
     <div class="main-container">
-        <!-- Video en vivo -->
-        <div class="video-section">
-            <h2>Video en Vivo</h2>
-            <video id="liveVideo" autoplay muted loop>
-                <source src="/static/imagen/bouncing.mp4" type="video/mp4">
-                Tu navegador no soporta el video HTML5.
-            </video>
-        </div>
-
         <!-- Sensores con imágenes y valores -->
         <div class="sensor-grid">
+            <div class="sensor-card">
+                <img src="/static/imagen/ID.png" alt="ID" class="sensor-img">
+                <h3>ID del dato</h3>
+                <p id="sensor5-value">Valor: 0</p>
+            </div>
             <div class="sensor-card">
                 <img src="/static/imagen/calidad_aire.png" alt="Calidad de Aire" class="sensor-img">
                 <h3>Calidad de Aire</h3>
@@ -49,15 +44,36 @@
             </div>
         </div>
     </div>
+    <form action="/altas" method="POST">
+        <label for="tiempo" class="sensor-card">Tiempo:</label>
+        <input type="text" id="tiempo" name="tiempo" required><br>
 
+        <label for="aire" class="sensor-card">Aire (valor numérico):</label>
+        <input type="number" step="any" id="aire" name="aire" required><br>
+
+        <label for="ultrasonico" class="sensor-card">Ultrasonico (valor numérico):</label>
+        <input type="number" step="any" id="ultrasonico" name="ultrasonico" required><br>
+
+        <label for="temperatura" class="sensor-card">Temperatura (valor numérico):</label>
+        <input type="number" step="any" id="temperatura" name="temperatura" required><br>
+
+        <label for="humedad" class="sensor-card">Humedad (valor numérico):</label>
+        <input type="number" step="any" id="humedad" name="humedad" required><br>
+
+        <button type="submit" class="btn-info">Agregar Registro</button>
+    </form>
+    <style>
+        label {
+            margin-bottom: 30px; /* Espacio entre los labels */
+        }
+        input {
+            margin-bottom: 30px; /* Espacio entre inputs */
+        }
+    </style>
     <!-- Botones en la esquina inferior derecha -->
     <div class="btn-container">
-        <a href="/" class="btn-info">Inicio</a>
-        <a href="/grafico" class="btn-info">Ver Gráficas en Tiempo Real</a>
-        <a href="/altas" class="btn-info">Altas modificaciones</a>
-        <a href="/bajas" class="btn-info">Bajas modificaciones</a>
-    </div>
-
+        <a href="/" class="btn-info">Volver a la página principal</a>
+    </div>>
     <script>
         const socket = io();
     
@@ -68,8 +84,8 @@
             $('#sensor2-value').text("Valor: " + data.Ultrasonico);
             $('#sensor3-value').text("Valor: " + data.Temperatura);
             $('#sensor4-value').text("Valor: " + data.Humedad);
+            $('#sensor5-value').text("ID: " + data.id);
         });
     </script>
-    
 </body>
 </html>

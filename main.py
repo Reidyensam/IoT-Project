@@ -11,8 +11,8 @@ def run_flask_socketio():
 
 async def main():
     # Ejecuta la app Flask-SocketIO en un hilo separado
-    flask_thread = Thread(target=run_flask_socketio)
-    flask_thread.start()
+    #flask_thread = Thread(target=run_flask_socketio)
+    #flask_thread.start()
 
     # Correr el servidor WebSocket y el procesamiento de cola en paralelo
     await asyncio.gather(

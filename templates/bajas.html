@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Bajas</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Formulario de Bajas (Eliminar Registros)</h1>
+    </header>
+    <div class="main-container">
+        <!-- Sensores con imágenes y valores -->
+        <div class="sensor-grid">
+            <div class="sensor-card">
+                <img src="/static/imagen/ID.png" alt="ID" class="sensor-img">
+                <h3>ID del dato</h3>
+                <p id="sensor5-value">Valor: 0</p>
+            </div>
+            <div class="sensor-card">
+                <img src="/static/imagen/calidad_aire.png" alt="Calidad de Aire" class="sensor-img">
+                <h3>Calidad de Aire</h3>
+                <p id="sensor1-value">Valor: 0</p>
+            </div>
+            <div class="sensor-card">
+                <img src="/static/imagen/humedad.png" alt="Humedad" class="sensor-img">
+                <h3>Humedad</h3>
+                <p id="sensor4-value">Valor: 0</p>
+            </div>
+            <div class="sensor-card">
+                <img src="/static/imagen/temperatura.png" alt="Temperatura" class="sensor-img">
+                <h3>Temperatura</h3>
+                <p id="sensor3-value">Valor: 0</p>
+            </div>
+            <div class="sensor-card">
+                <img src="/static/imagen/ultrasonico.png" alt="Ultrasónico" class="sensor-img">
+                <h3>Ultrasónico</h3>
+                <p id="sensor2-value">Valor: 0</p>
+            </div>
+        </div>
+    </div>
+    <form id="search-form" action="/buscar" method="GET">
+        <label for="search_id" class="sensor-card">Buscar Registro por ID:</label>
+        <input type="number" id="search_id" name="search_id" required><br><br>
+        <button type="submit" class="btn-info">Buscar</button>
+    </form>
+    <!-- Separador con margen -->
+    <div style="margin: 20px 0;"></div>
+    
+    <form action="/bajas" method="POST">
+        <label for="record_id" class="sensor-card">ID del Registro a Eliminar:</label>
+        <input type="number" id="record_id" name="record_id" required><br><br>
+        <button type="submit" class="btn-info">Eliminar</button>
+    </form>
+    
+    
+    
+    <!-- Contenedor del gráfico -->
+    <div style="width: 60%; margin-top: 20px;">
+        <canvas id="sensorChart"></canvas>
+    </div>
+
+    <!-- Botones en la esquina inferior derecha -->
+    <div class="btn-container">
+        <a href="/" class="btn-info">Volver a la página principal</a>
+    </div>
+
+    <script>
+        const socket = io();
+
+        // Actualización en tiempo real de valores desde el servidor
+        socket.on('updateTable', (data) => {
+            $('#sensor1-value').text("Valor: " + data.aire);
+            $('#sensor2-value').text("Valor: " + data.Ultrasonico);
+            $('#sensor3-value').text("Valor: " + data.Temperatura);
+            $('#sensor4-value').text("Valor: " + data.Humedad);
+            $('#sensor5-value').text("ID: " + data.id);
+            actualizarGrafico(data);  // Actualizar gráfico con los datos obtenidos
+        });
+
+        // Manejo de la búsqueda sin recargar la página
+        $('#search-form').on('submit', function(e) {
+            e.preventDefault();  // Evitar el envío estándar del formulario
+            const searchId = $('#search_id').val();
+
+            // Realizar la búsqueda a través de AJAX
+            $.ajax({
+                url: `/buscar?id=${searchId}`,
+                method: 'GET',
+                success: function(data) {
+                    $('#sensor1-value').text("Valor: " + data.aire);
+                    $('#sensor2-value').text("Valor: " + data.Ultrasonico);
+                    $('#sensor3-value').text("Valor: " + data.Temperatura);
+                    $('#sensor4-value').text("Valor: " + data.Humedad);
+                    $('#sensor5-value').text("ID: " + data.id);
+                    actualizarGrafico(data);  // Actualizar gráfico con los datos de la búsqueda
+                }
+            });
+        });
+    </script>
+</body>
+</html>

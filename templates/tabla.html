@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos en Tiempo Real</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Diseño global */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1e1e1e; /* Fondo oscuro */
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            width: 80%;
+            max-width: 1000px;
+            margin: 50px 0;
+            padding: 20px;
+            background-color: #2c2c2c;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-container {
+            margin-top: 20px;
+        }
+
+        .btn-info {
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1.2em;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        .btn-info:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilos de la gráfica */
+        .chart-container canvas {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Gráfica de Lectura de Sensores</h1>
+    </header>
+
+    <div class="chart-container">
+        <canvas id="sensorChart" width="400" height="300"></canvas>
+    </div>
+
+    <div class="btn-container">
+        <a href="/" class="btn-info">Volver a la Página Principal</a>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('sensorChart').getContext('2d');
+        const sensorChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    { label: 'Calidad de Aire', borderColor: 'rgba(255, 99, 132, 1)', data: [], fill: false },
+                    { label: 'Humedad', borderColor: 'rgba(54, 162, 235, 1)', data: [], fill: false },
+                    { label: 'Temperatura', borderColor: 'rgba(75, 192, 192, 1)', data: [], fill: false },
+                    { label: 'Ultrasónico', borderColor: 'rgba(153, 102, 255, 1)', data: [], fill: false }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,  // Desactivar la animación de inicio
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Tiempo (s)',
+                            color: 'white',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            color: 'white',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Valor',
+                            color: 'white',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            color: 'white',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false,  // Desactivar la leyenda
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        footerColor: 'white',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    intersect: false
+                }
+            }
+        });
+
+        const socket = io();
+
+        // Escucha el evento 'updateTable' y actualiza los valores de los sensores
+        socket.on('updateTable', (data) => {
+            // Actualiza los valores de los sensores en tiempo real
+            const newTime = new Date().toLocaleTimeString();
+
+            // Limita las etiquetas del tiempo a un máximo de 20
+            if (sensorChart.data.labels.length > 20) sensorChart.data.labels.shift();
+            sensorChart.data.labels.push(newTime);
+
+            // Agrega los datos recibidos a las gráficas
+            sensorChart.data.datasets[0].data.push(data.aire);        // Calidad de aire
+            sensorChart.data.datasets[1].data.push(data.Humedad);     // Humedad
+            sensorChart.data.datasets[2].data.push(data.Temperatura); // Temperatura
+            sensorChart.data.datasets[3].data.push(data.Ultrasonico); // Ultrasónico
+
+            // Elimina los datos más antiguos si la longitud supera los 20 puntos
+            sensorChart.data.datasets.forEach(dataset => {
+                if (dataset.data.length > 20) dataset.data.shift();
+            });
+
+            // Actualiza la gráfica para reflejar los cambios
+            sensorChart.update();
+        });
+    </script>
+</body>
+</html>
