@@ -165,7 +165,7 @@
             const newTime = new Date().toLocaleTimeString();
 
             // Limita las etiquetas del tiempo a un máximo de 20
-            if (sensorChart.data.labels.length > 20) sensorChart.data.labels.shift();
+            if (sensorChart.data.labels.length > 40) sensorChart.data.labels.shift();
             sensorChart.data.labels.push(newTime);
 
             // Agrega los datos recibidos a las gráficas
