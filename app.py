@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 import mysql.connector
@@ -48,5 +47,7 @@ def data_stream():
 @socketio.on('connect')
 def handle_connect():
     socketio.start_background_task(data_stream)
+
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+
