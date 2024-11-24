@@ -1,7 +1,7 @@
 # data_processor.py
 import mysql.connector
 import asyncio
-from websocket_server import message_queue
+from websocket_server import sensor_queue
 
 db_config = {
     'host': 'localhost',
@@ -37,8 +37,8 @@ async def insert_data(data):
 
 async def process_queue():
     while True:
-        if message_queue:
+        if sensor_queue:
             # Aquí puedes añadir un mecanismo de sincronización si es necesario
-            data = message_queue.pop(0)
+            data = sensor_queue.pop(0)
             await insert_data(data)
         await asyncio.sleep(0.5)

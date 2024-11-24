@@ -11,50 +11,80 @@
 </head>
 <body>
     <header>
-        <h1>Formulario de Bajas (Eliminar Registros)</h1>
+        <h2 style="font-size: 40px; color: rgb(255, 0, 255); line-height: 1.5; text-align: center; margin-top: 50px">Formulario de Bajas (Eliminar Registros)</h2>
     </header>
     <div class="main-container">
         <!-- Sensores con imágenes y valores -->
         <div class="sensor-grid">
             <div class="sensor-card">
                 <img src="/static/imagen/ID.png" alt="ID" class="sensor-img">
-                <h3>ID del dato</h3>
-                <p id="sensor5-value">Valor: 0</p>
+                <h2>ID del dato</h2>
+                <h2 style="font-size: 15px;"><p id="sensor5-value">Valor: 0</p></h2>
             </div>
             <div class="sensor-card">
-                <img src="/static/imagen/calidad_aire.png" alt="Calidad de Aire" class="sensor-img">
-                <h3>Calidad de Aire</h3>
-                <p id="sensor1-value">Valor: 0</p>
+                <img src="/static/imagen/calidad-del-aire.png" alt="Calidad de Aire" class="sensor-img">
+                <h2>Calidad de Aire</h2>
+                <h2 style="font-size: 15px;"><p id="sensor1-value">Valor: 0</p></h2>
             </div>
             <div class="sensor-card">
                 <img src="/static/imagen/humedad.png" alt="Humedad" class="sensor-img">
-                <h3>Humedad</h3>
-                <p id="sensor4-value">Valor: 0</p>
+                <h2>Humedad</h2>
+                <h2 style="font-size: 15px;"><p id="sensor4-value">Valor: 0</p></h2>
             </div>
             <div class="sensor-card">
-                <img src="/static/imagen/temperatura.png" alt="Temperatura" class="sensor-img">
-                <h3>Temperatura</h3>
-                <p id="sensor3-value">Valor: 0</p>
+                <img src="/static/imagen/temp.png" alt="Temperatura" class="sensor-img">
+                <h2>Temperatura</h2>
+                <h2 style="font-size: 15px;"><p id="sensor3-value">Valor: 0</p></h2>
             </div>
             <div class="sensor-card">
-                <img src="/static/imagen/ultrasonico.png" alt="Ultrasónico" class="sensor-img">
-                <h3>Ultrasónico</h3>
-                <p id="sensor2-value">Valor: 0</p>
+                <img src="/static/imagen/distancia.png" alt="Ultrasónico" class="sensor-img">
+                <h2>Ultrasónico</h2>
+                <h2 style="font-size: 15px;"><p id="sensor2-value">Valor: 0</p></h2>
             </div>
         </div>
     </div>
-    <form id="search-form" action="/buscar" method="GET">
-        <label for="search_id" class="sensor-card">Buscar Registro por ID:</label>
-        <input type="number" id="search_id" name="search_id" required><br><br>
-        <button type="submit" class="btn-info">Buscar</button>
+    <form id="search-form" action="/buscar" method="GET" style="margin-left: 50px;">
+        <input placeholder="Buscar Registro por ID" class="input" type="number" id="search_id" name="search_id" required><br><br>
+        <button type="submit" href="#" class="buttonB" style="--clr: rgb(0, 255, 255)#">
+            <span class="buttonB__icon-wrapper">
+              <svg
+                viewBox="0 0 14 15"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="buttonB__icon-svg"
+                width="10"
+              >
+                <path
+                  d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+          
+              <svg
+                viewBox="0 0 14 15"
+                fill="none"
+                width="10"
+                xmlns="http://www.w3.org/2000/svg"
+                class="buttonB__icon-svg buttonB__icon-svg--copy"
+              >
+                <path
+                  d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </span>
+            BUSCAR
+        </button>
+          
     </form>
     <!-- Separador con margen -->
     <div style="margin: 20px 0;"></div>
     
-    <form action="/bajas" method="POST">
-        <label for="record_id" class="sensor-card">ID del Registro a Eliminar:</label>
-        <input type="number" id="record_id" name="record_id" required><br><br>
-        <button type="submit" class="btn-info">Eliminar</button>
+    <form action="/bajas" method="POST" style="margin-left: 50px;">
+        <input placeholder="ID del Registro a Eliminar" class="input" type="number" id="record_id" name="record_id" required><br><br>
+        <button type="submit" class="buttonD">
+            <svg viewBox="0 0 448 512" class="svgIcon"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path></svg>
+        </button>
     </form>
     
     

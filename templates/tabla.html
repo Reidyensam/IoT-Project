@@ -42,25 +42,6 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
-        .btn-container {
-            margin-top: 20px;
-        }
-
-        .btn-info {
-            background-color: #007BFF;
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 1.2em;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s;
-        }
-
-        .btn-info:hover {
-            background-color: #0056b3;
-        }
-
         /* Estilos de la gráfica */
         .chart-container canvas {
             border-radius: 10px;
@@ -69,7 +50,7 @@
 </head>
 <body>
     <header>
-        <h1>Gráfica de Lectura de Sensores</h1>
+        <h2 style="font-size: 35px;">Gráfica de Lectura de Sensores</h2>
     </header>
 
     <div class="chart-container">
@@ -81,28 +62,49 @@
     </div>
 
     <script>
+        // Configuración inicial del gráfico
         const ctx = document.getElementById('sensorChart').getContext('2d');
         const sensorChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: [],
                 datasets: [
-                    { label: 'Calidad de Aire', borderColor: 'rgba(255, 99, 132, 1)', data: [], fill: false },
-                    { label: 'Humedad', borderColor: 'rgba(54, 162, 235, 1)', data: [], fill: false },
-                    { label: 'Temperatura', borderColor: 'rgba(75, 192, 192, 1)', data: [], fill: false },
-                    { label: 'Ultrasónico', borderColor: 'rgba(153, 102, 255, 1)', data: [], fill: false }
+                    { 
+                        label: 'Calidad de Aire', 
+                        borderColor: 'rgba(255, 99, 132, 1)', 
+                        data: [], 
+                        fill: false 
+                    },
+                    { 
+                        label: 'Humedad', 
+                        borderColor: 'rgba(54, 162, 235, 1)', 
+                        data: [], 
+                        fill: false 
+                    },
+                    { 
+                        label: 'Temperatura', 
+                        borderColor: 'rgba(75, 192, 192, 1)', 
+                        data: [], 
+                        fill: false 
+                    },
+                    { 
+                        label: 'Ultrasónico', 
+                        borderColor: 'rgba(153, 102, 255, 1)', 
+                        data: [], 
+                        fill: false 
+                    }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: false,  // Desactivar la animación de inicio
+                animation: false,  // Desactiva animaciones para rendimiento
                 scales: {
                     x: {
                         display: true,
                         title: {
                             display: true,
-                            text: 'Tiempo (s)',
+                            text: 'Tiempo',
                             color: 'white',
                             font: {
                                 size: 16,
@@ -139,7 +141,7 @@
                 },
                 plugins: {
                     legend: {
-                        display: false,  // Desactivar la leyenda
+                        display: true,  // Muestra la leyenda para identificar las líneas
                     },
                     tooltip: {
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -159,28 +161,37 @@
 
         const socket = io();
 
+        // Último tiempo registrado
+        let lastTime = null;
+
         // Escucha el evento 'updateTable' y actualiza los valores de los sensores
         socket.on('updateTable', (data) => {
-            // Actualiza los valores de los sensores en tiempo real
-            const newTime = new Date().toLocaleTimeString();
+            const newTime = new Date().toLocaleTimeString(); // Hora actual
 
-            // Limita las etiquetas del tiempo a un máximo de 20
-            if (sensorChart.data.labels.length > 40) sensorChart.data.labels.shift();
-            sensorChart.data.labels.push(newTime);
+            // Verifica que el nuevo tiempo sea diferente al último registrado
+            if (newTime !== lastTime) {
+                lastTime = newTime;
 
-            // Agrega los datos recibidos a las gráficas
-            sensorChart.data.datasets[0].data.push(data.aire);        // Calidad de aire
-            sensorChart.data.datasets[1].data.push(data.Humedad);     // Humedad
-            sensorChart.data.datasets[2].data.push(data.Temperatura); // Temperatura
-            sensorChart.data.datasets[3].data.push(data.Ultrasonico); // Ultrasónico
+                // Limita las etiquetas del tiempo a un máximo de 40
+                if (sensorChart.data.labels.length >= 40) {
+                    sensorChart.data.labels.shift(); // Elimina la etiqueta más antigua
+                }
+                sensorChart.data.labels.push(newTime); // Agrega la nueva etiqueta
 
-            // Elimina los datos más antiguos si la longitud supera los 20 puntos
-            sensorChart.data.datasets.forEach(dataset => {
-                if (dataset.data.length > 20) dataset.data.shift();
-            });
+                // Agrega los datos recibidos a las gráficas
+                sensorChart.data.datasets[0].data.push(data.aire || 0);        // Calidad de aire
+                sensorChart.data.datasets[1].data.push(data.Humedad || 0);     // Humedad
+                sensorChart.data.datasets[2].data.push(data.Temperatura || 0); // Temperatura
+                sensorChart.data.datasets[3].data.push(data.Ultrasonico || 0); // Ultrasónico
 
-            // Actualiza la gráfica para reflejar los cambios
-            sensorChart.update();
+                // Elimina los datos más antiguos si supera los 40 puntos
+                sensorChart.data.datasets.forEach(dataset => {
+                    if (dataset.data.length >= 40) dataset.data.shift();
+                });
+
+                // Actualiza la gráfica para reflejar los cambios
+                sensorChart.update();
+            }
         });
     </script>
 </body>
