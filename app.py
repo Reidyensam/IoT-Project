@@ -103,6 +103,11 @@ def buscar():
     except mysql.connector.Error as err:
         return f"Error al buscar el registro: {err}", 500
 
+@app.route('/control')
+def control():
+    return render_template('control.html')
+
+
 # Emite el último registro y el gráfico en tiempo real
 def data_stream():
     fibomassi_values = []

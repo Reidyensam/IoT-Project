@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control WebSocket desde HTML</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const websocketUrl = "ws://localhost:8080"; // Dirección del servidor WebSocket
+            const socket = new WebSocket(websocketUrl);
+
+            const output = document.getElementById("output");
+
+            // Evento de conexión al WebSocket
+            socket.addEventListener("open", () => {
+                logMessage("Conexión WebSocket abierta.");
+            });
+
+            // Evento para manejar mensajes del servidor
+            socket.addEventListener("message", (event) => {
+                logMessage(`Respuesta del servidor: ${event.data}`);
+            });
+
+            // Evento para capturar errores
+            socket.addEventListener("error", (error) => {
+                logMessage("Error en WebSocket:", error);
+            });
+
+            // Evento para capturar cierre de conexión
+            socket.addEventListener("close", () => {
+                logMessage("Conexión WebSocket cerrada.");
+            });
+
+            // Capturar eventos del teclado
+            document.addEventListener("keydown", (event) => {
+                const key = event.key; // Captura la tecla presionada
+                if (["w", "s", "a", "d"].includes(key)) {
+                    const message = {
+                        role: "control",
+                        Tecla: key
+                    };
+                    logMessage(`Enviando comando: ${JSON.stringify(message)}`);
+                    socket.send(JSON.stringify(message)); // Enviar mensaje como JSON
+                }
+            });
+
+            // Función para registrar mensajes en la página
+            function logMessage(message) {
+                const p = document.createElement("p");
+                p.textContent = message;
+                output.appendChild(p);
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Control WebSocket desde HTML</h1>
+    <p>Presiona las teclas <strong>w</strong>, <strong>s</strong>, <strong>a</strong>, <strong>d</strong> para enviar comandos al servidor WebSocket.</p>
+    <div id="output" style="border: 1px solid #ccc; padding: 10px; max-height: 200px; overflow-y: scroll;">
+        <!-- Aquí se mostrarán los mensajes -->
+    </div>
+</body>
+</html>
