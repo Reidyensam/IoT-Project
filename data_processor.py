@@ -1,8 +1,9 @@
-# data_processor.py
 import mysql.connector
 import asyncio
-from websocket_server import sensor_queue
+from concurrent.futures import ThreadPoolExecutor
+from websocket_server import sensor_queue  # Importa la cola compartida
 
+# Configuración de la base de datos
 db_config = {
     'host': 'localhost',
     'user': 'root',
@@ -10,7 +11,10 @@ db_config = {
     'database': 'proyecto iot'
 }
 
-async def insert_data(data):
+def insert_data_sync(data):
+    """
+    Inserta datos en la base de datos de forma sincrónica (usado en un hilo separado).
+    """
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
@@ -27,8 +31,7 @@ async def insert_data(data):
         )
         cursor.execute(sql, values)
         conn.commit()
-        print("Datos insertados en la base de datos:", data)
-
+        print("Datos insertados:", data)
     except mysql.connector.Error as err:
         print(f"Error en la conexión a la base de datos: {err}")
     finally:
@@ -36,9 +39,15 @@ async def insert_data(data):
         conn.close()
 
 async def process_queue():
+    """
+    Procesa la cola de sensores de forma asíncrona.
+    """
+    executor = ThreadPoolExecutor()
     while True:
-        if sensor_queue:
-            # Aquí puedes añadir un mecanismo de sincronización si es necesario
-            data = sensor_queue.pop(0)
-            await insert_data(data)
-        await asyncio.sleep(0.5)
+        data = await sensor_queue.get()
+        print(f"Procesando datos: {data}")
+        # Enviar a un hilo separado para evitar bloqueos
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(executor, insert_data_sync, data)
+        sensor_queue.task_done()
+        await asyncio.sleep(0.1)

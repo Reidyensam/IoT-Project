@@ -8,7 +8,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 </head>
 <body>
     <header>
@@ -19,10 +18,7 @@
         <!-- Video en vivo -->
         <div class="video-section">
             <h2>Video en Vivo</h2>
-            <video id="liveVideo" autoplay muted loop>
-                <source src="/static/imagen/bouncing.mp4" type="video/mp4">
-                Tu navegador no soporta el video HTML5.
-            </video>
+            <img id="videoFrame" alt="Stream de video en vivo" style="display: block; margin: auto; width: 640px; height: 480px;">
         </div>
 
         <!-- Sensores con imágenes y valores -->
@@ -30,22 +26,22 @@
             <div class="sensor-card">
                 <img src="/static/imagen/calidad-del-aire.png" alt="Calidad de Aire" class="sensor-img">
                 <h2>Calidad de Aire</h2>
-                <h2 style="font-size: 15px;"></he><p id="sensor1-value">Valor: 0</p></h2>
+                <p id="sensor1-value" style="font-size: 15px;">Valor: 0</p>
             </div>
             <div class="sensor-card">
                 <img src="/static/imagen/humedad.png" alt="Humedad" class="sensor-img">
                 <h2>Humedad</h2>
-                <h2 style="font-size: 15px;"><p id="sensor4-value">Valor: 0</p></h2>
+                <p id="sensor4-value" style="font-size: 15px;">Valor: 0</p>
             </div>
             <div class="sensor-card">
                 <img src="/static/imagen/temp.png" alt="Temperatura" class="sensor-img">
                 <h2>Temperatura</h2>
-                <h2 style="font-size: 15px;"><p id="sensor3-value">Valor: 0</p></h2>
+                <p id="sensor3-value" style="font-size: 15px;">Valor: 0</p>
             </div>
             <div class="sensor-card">
                 <img src="/static/imagen/distancia.png" alt="Ultrasónico" class="sensor-img">
                 <h2>Ultrasónico</h2>
-                <h2 style="font-size: 15px;"><p id="sensor2-value">Valor: 0</p></h2>
+                <p id="sensor2-value" style="font-size: 15px;">Valor: 0</p>
             </div>
         </div>
     </div>
@@ -60,9 +56,32 @@
     </div>
 
     <script>
+        // Conexión al WebSocket para recibir frames de video
+        const socketVideo = new WebSocket("ws://192.168.102.75:8080");  // Cambia localhost si el servidor está en otra dirección
+        const videoFrame = document.getElementById("videoFrame");
+
+        socketVideo.onopen = () => {
+            console.log("Conectado al servidor WebSocket para video.");
+        };
+
+        socketVideo.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.role === "stream" && data.frame) {
+                    videoFrame.src = "data:image/jpeg;base64," + data.frame;
+                }
+            } catch (error) {
+                console.error("Error al procesar el mensaje del WebSocket:", error);
+            }
+        };
+
+        socketVideo.onclose = () => {
+            console.log("Desconectado del servidor WebSocket para video.");
+        };
+
+        // Conexión al servidor para actualizar los datos de los sensores
         const socket = io();
-    
-        // Escucha el evento 'updateTable' y actualiza la información de los sensores
+
         socket.on('updateTable', (data) => {
             // Actualiza los valores de los sensores en tiempo real
             $('#sensor1-value').text("Valor: " + data.aire);
@@ -71,6 +90,5 @@
             $('#sensor4-value').text("Valor: " + data.Humedad);
         });
     </script>
-    
 </body>
 </html>
