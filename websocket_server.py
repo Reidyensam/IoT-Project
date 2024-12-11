@@ -68,7 +68,6 @@ async def send_response_on_keypress(websocket):
         # Esperar un pequeño tiempo para procesar los cambios de tecla
         await asyncio.sleep(0.05)
 
-
 async def process_sensor_data():
     while True:
         data = await sensor_queue.get()

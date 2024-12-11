@@ -9,6 +9,5 @@ async def main():
         start_websocket_server(),
         process_queue()
     )
-
 if __name__ == "__main__":
     asyncio.run(main())
